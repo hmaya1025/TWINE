@@ -10,7 +10,7 @@ Base de despliegue de `twineprotein.com` en el VPS `177.7.57.250`.
 - `deploy/`: publicación por SSH, activación con reversión y virtual host TLS propio.
 - `.github/workflows/production-deploy.yml`: validación para PR y despliegue al integrar en `main`.
 
-La página incluida es solo una pantalla temporal de configuración. El sitio final se puede sustituir en `site/` sin cambiar el flujo de despliegue.
+La portada incluida presenta la identidad de TWINE y su estado temporal de construcción. El contenido del sitio final se puede ampliar en `site/` sin cambiar el flujo de despliegue.
 
 ## GitHub Actions
 
