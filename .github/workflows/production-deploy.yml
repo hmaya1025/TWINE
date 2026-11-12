@@ -1,0 +1,85 @@
+name: Production CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validar Docker Compose
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Validar y construir la imagen Docker
+        run: |
+          docker compose -f deploy/compose.production.yml config --quiet
+          docker compose -f deploy/compose.production.yml build
+
+  deploy:
+    name: Desplegar producción
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_HOST != '' && vars.DEPLOY_USER != '' && vars.DEPLOY_PORT != ''
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment:
+      name: production
+      url: https://twineprotein.com
+    concurrency:
+      group: twine-production
+      cancel-in-progress: false
+    env:
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+      PRODUCTION_SSH_PRIVATE_KEY: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+      PRODUCTION_KNOWN_HOSTS: ${{ secrets.PRODUCTION_KNOWN_HOSTS }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Preparar SSH verificado
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          set +x
+          : "${DEPLOY_HOST:?Configura la variable DEPLOY_HOST en production}"
+          : "${DEPLOY_USER:?Configura la variable DEPLOY_USER en production}"
+          : "${DEPLOY_PORT:?Configura la variable DEPLOY_PORT en production}"
+          : "${PRODUCTION_SSH_PRIVATE_KEY:?Configura el secreto PRODUCTION_SSH_PRIVATE_KEY en production}"
+          : "${PRODUCTION_KNOWN_HOSTS:?Configura el secreto PRODUCTION_KNOWN_HOSTS en production}"
+
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$PRODUCTION_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+          key_file="$RUNNER_TEMP/twine-production-ed25519"
+          printf '%s\n' "$PRODUCTION_SSH_PRIVATE_KEY" > "$key_file"
+          chmod 600 "$key_file"
+          eval "$(ssh-agent -s)"
+          trap 'ssh-agent -k >/dev/null 2>&1 || true; rm -f "$key_file"' EXIT
+          ssh-add "$key_file"
+
+          ssh -p "$DEPLOY_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=15 \
+            "$DEPLOY_USER@$DEPLOY_HOST" true
+
+          pwsh -NoLogo -NoProfile -File deploy/deploy.ps1 \
+            -SshTarget "$DEPLOY_USER@$DEPLOY_HOST" \
+            -SshPort "$DEPLOY_PORT"
