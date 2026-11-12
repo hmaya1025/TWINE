@@ -30,7 +30,7 @@ jobs:
 
   deploy:
     name: Desplegar producción
-    if: github.ref == 'refs/heads/main' && vars.DEPLOY_HOST != '' && vars.DEPLOY_USER != '' && vars.DEPLOY_PORT != ''
+    if: github.ref == 'refs/heads/main'
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -47,12 +47,27 @@ jobs:
       PRODUCTION_SSH_PRIVATE_KEY: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
       PRODUCTION_KNOWN_HOSTS: ${{ secrets.PRODUCTION_KNOWN_HOSTS }}
     steps:
+      - name: Comprobar configuración de producción
+        id: config
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if [[ -z "$DEPLOY_HOST" || -z "$DEPLOY_USER" || -z "$DEPLOY_PORT" || \
+                -z "$PRODUCTION_SSH_PRIVATE_KEY" || -z "$PRODUCTION_KNOWN_HOSTS" ]]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Producción pendiente::Configura las variables y secretos del entorno production para habilitar el despliegue."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
+        if: steps.config.outputs.ready == 'true'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
       - name: Preparar SSH verificado
+        if: steps.config.outputs.ready == 'true'
         shell: bash
         run: |
           set -Eeuo pipefail
