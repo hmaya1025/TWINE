@@ -4,22 +4,184 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>TWINE</title>
+    <meta name="description" content="TWINE — Clear Protein + Collagen. Estamos preparando el sitio. Muy pronto." />
+    <meta name="theme-color" content="#f8f8f2" />
+    <title>TWINE — Clear Protein + Collagen | Muy pronto</title>
     <style>
-      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      :root {
+        color-scheme: light;
+        font-family: "Avenir Next", Avenir, "Century Gothic", sans-serif;
+        color: #244a2a;
+        background: #f8f8f2;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
       * { box-sizing: border-box; }
-      body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #111713; color: #f5f5ef; }
-      main { width: min(90vw, 680px); padding: 3rem; border: 1px solid #35423a; border-radius: 1rem; background: #18211b; }
-      p { color: #bac7bd; line-height: 1.6; }
-      h1 { margin: 0; letter-spacing: .16em; font-size: clamp(2.5rem, 9vw, 5rem); }
-      .status { margin-top: 2rem; color: #a9d7bd; font-size: .875rem; letter-spacing: .08em; text-transform: uppercase; }
+
+      body {
+        min-width: 280px;
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+      }
+
+      main {
+        width: min(100%, 980px);
+      }
+
+      .brand-panel {
+        position: relative;
+        display: grid;
+        justify-items: center;
+        min-height: 340px;
+        padding: 62px 24px 54px;
+        overflow: hidden;
+        isolation: isolate;
+        text-align: center;
+        background: linear-gradient(108deg, #e1efd9 0%, #f5f3e9 51%, #f4d2d9 100%);
+      }
+
+      .brand-panel::before,
+      .brand-panel::after {
+        position: absolute;
+        z-index: -1;
+        width: 15rem;
+        height: 15rem;
+        border-radius: 50%;
+        content: "";
+        filter: blur(46px);
+        opacity: .32;
+      }
+
+      .brand-panel::before {
+        top: -12rem;
+        left: 18%;
+        background: #d5e7cc;
+      }
+
+      .brand-panel::after {
+        right: 10%;
+        bottom: -13rem;
+        background: #f2bdcd;
+      }
+
+      .sparkle {
+        position: absolute;
+        top: 21%;
+        right: 24%;
+        color: #567b4b;
+        font-size: 15px;
+        opacity: .46;
+      }
+
+      .identity {
+        margin: auto 0 0;
+      }
+
+      h1 {
+        margin: 0;
+        padding-left: .34em;
+        color: #214d2b;
+        font-size: clamp(2.8rem, 7vw, 4.1rem);
+        font-weight: 400;
+        letter-spacing: .34em;
+        line-height: 1;
+      }
+
+      .descriptor {
+        margin: 15px 0 0;
+        padding-left: .24em;
+        color: #436d46;
+        font-size: .67rem;
+        font-weight: 600;
+        letter-spacing: .24em;
+        line-height: 1.6;
+        text-transform: uppercase;
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin: 46px 0 0;
+        color: #335c39;
+        font-size: .77rem;
+        font-weight: 600;
+        letter-spacing: .13em;
+        line-height: 1.5;
+        text-transform: uppercase;
+      }
+
+      .dots {
+        display: inline-flex;
+        gap: 3px;
+        align-items: center;
+        height: 1em;
+      }
+
+      .dots span {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #759263;
+        animation: dot-loading 1.2s ease-in-out infinite;
+      }
+
+      .dots span:nth-child(2) { animation-delay: .18s; }
+      .dots span:nth-child(3) { animation-delay: .36s; }
+
+      .teaser {
+        margin: 10px 0 0;
+        color: #65795f;
+        font-size: .82rem;
+        font-weight: 400;
+        letter-spacing: .035em;
+        line-height: 1.6;
+      }
+
+      @keyframes dot-loading {
+        0%, 60%, 100% { transform: translateY(0); opacity: .38; }
+        30% { transform: translateY(-4px); opacity: 1; }
+      }
+
+      @media (max-width: 520px) {
+        body { padding: 18px; }
+        .brand-panel { min-height: 300px; padding: 56px 16px 46px; }
+        .sparkle { right: 16%; top: 17%; }
+        .descriptor { font-size: .59rem; letter-spacing: .17em; }
+        .status { margin-top: 41px; font-size: .66rem; letter-spacing: .1em; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          scroll-behavior: auto !important;
+          animation-duration: .01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: .01ms !important;
+        }
+        .dots span { opacity: .8; }
+      }
     </style>
   </head>
   <body>
     <main>
-      <h1>TWINE</h1>
-      <p>Estamos preparando este sitio.</p>
-      <p class="status">Despliegue conectado</p>
+      <section class="brand-panel" aria-labelledby="brand-name">
+        <span class="sparkle" aria-hidden="true">✦</span>
+        <div class="identity">
+          <h1 id="brand-name">TWINE</h1>
+          <p class="descriptor">Clear Protein + Collagen</p>
+          <p class="status" role="status">
+            Estamos en construcción
+            <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          </p>
+          <p class="teaser">Algo nuevo se está mezclando.</p>
+        </div>
+      </section>
     </main>
   </body>
 </html>
